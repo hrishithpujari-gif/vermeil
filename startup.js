@@ -8,7 +8,7 @@ const path = require("path");
 
 const log = (msg) => console.log(`\x1b[35m[Startup]\x1b[0m ${msg}`);
 
-const REPO_URL = "https://github.com/sinlt0/vermeil.git";
+const REPO_URL = "https://github.com/hrishithpujari-gif/vermeil.git";
 
 console.log("\x1b[36m============================================================\x1b[0m");
 log("Z+ Security Autoupdate System initialized.");
