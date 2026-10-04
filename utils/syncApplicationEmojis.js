@@ -27,7 +27,7 @@ async function syncApplicationEmojis(client) {
      * Example:
      * src/emojis/
      */
-    const emojiDirectory = path.join(process.cwd(), "src", "emojis");
+    const emojiDirectory = path.join(process.cwd(), "emojis");
 
     if (!fs.existsSync(emojiDirectory)) {
         console.log(
