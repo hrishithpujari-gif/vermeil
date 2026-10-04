@@ -6,29 +6,35 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 process.env.USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
 const { Client, Collection } = require("discord.js");
-const { intents, partials }  = require("./utils/intents");
+const { intents, partials } = require("./utils/intents");
 const config = require("./config");
-const chalk  = require("chalk");
+const chalk = require("chalk");
+
+const {
+  syncApplicationEmojis
+} = require("./utils/syncApplicationEmojis");
 
 // ── Resolve token from .env or config.js ─────────────────
-const TOKEN     = process.env.TOKEN || config.token;
-const MONGO_URI = process.env.MONGODB_URI || null; // null = use cluster array from config
+const TOKEN = process.env.TOKEN || config.token;
+const MONGO_URI = process.env.MONGODB_URI || null;
 
 // ── Client ────────────────────────────────────────────────
-const client = new Client({ intents, partials });
+const client = new Client({
+  intents,
+  partials
+});
 
 // ── Error Handling ────────────────────────────────────────
 require("./utils/errorHandler")(client);
 
 // ── Client-level collections & config ─────────────────────
-client.commands   = new Collection(); // name  → command object
-client.aliases    = new Collection(); // alias → command name
-client.slashCmds  = new Collection(); // name  → command object (slash)
-client.cooldowns  = new Collection();
-client.config     = config;
-client.token      = TOKEN;
-client.mongoURI   = MONGO_URI;        // single URI override (optional env)
-// client.db will be attached by the database handler
+client.commands = new Collection();
+client.aliases = new Collection();
+client.slashCmds = new Collection();
+client.cooldowns = new Collection();
+client.config = config;
+client.token = TOKEN;
+client.mongoURI = MONGO_URI;
 
 // ── Load all handlers then login ─────────────────────────
 const loadHandlers = require("./handlers/handlerLoader");
@@ -38,13 +44,35 @@ const loadHandlers = require("./handlers/handlerLoader");
     await loadHandlers(client);
     await client.login(TOKEN);
 
+    // ── Application Emoji Sync ───────────────────────────
+    try {
+      await syncApplicationEmojis(client);
+    } catch (err) {
+      console.error(
+        "[EMOJI SYNC] Failed:",
+        err
+      );
+    }
+
     // ── Database Monitoring ──────────────────────────────
     const { runDbMonitor } = require("./utils/dbMonitorUtils");
-    setTimeout(() => runDbMonitor(client), 10000); // Initial run after 10s
-    setInterval(() => runDbMonitor(client), 10 * 60 * 1000); // Every 10 mins
+
+    setTimeout(
+      () => runDbMonitor(client),
+      10000
+    );
+
+    setInterval(
+      () => runDbMonitor(client),
+      10 * 60 * 1000
+    );
 
   } catch (err) {
-    console.error(chalk.red.bold("\n❌  Fatal error during startup:"), err.message);
+    console.error(
+      chalk.red.bold("\n❌  Fatal error during startup:"),
+      err.message
+    );
+
     process.exit(1);
   }
 })();
