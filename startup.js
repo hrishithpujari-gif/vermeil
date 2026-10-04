@@ -11,7 +11,7 @@ const log = (msg) => console.log(`\x1b[35m[Startup]\x1b[0m ${msg}`);
 const REPO_URL = "https://github.com/sinlt0/vermeil.git";
 
 console.log("\x1b[36m============================================================\x1b[0m");
-log("Vermeil Autoupdate System initialized.");
+log("Z+ Security Autoupdate System initialized.");
 
 function runCommand(cmd) {
   try {
